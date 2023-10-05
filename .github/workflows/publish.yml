@@ -16,5 +16,3 @@ jobs:
           docker build . --tag ghcr.io/jonathanpegaz/devops:staging
           docker run ghcr.io/jonathanpegaz/devops:staging
           docker push ghcr.io/jonathanpegaz/devops:staging
-      - name: Coveralls
-      uses: coverallsapp/github-action@v2
