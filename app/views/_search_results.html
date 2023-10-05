@@ -5,7 +5,7 @@
     <h3 class="panel-title">Search Results</h3>
   </div>
   <div class="panel-body">
-
+    
     <% if (photos.length) { %>
 
       <ul>
@@ -18,6 +18,9 @@
           </li>
         <% }) %>
       </ul>
+      <% if (signedUrls.length) { %>
+        <p> <%= signedUrls %> </p>
+      <% } %>
 
     <% } else { %>
       <div class="alert alert-info"><strong>No results</strong></div>
