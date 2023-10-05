@@ -11,9 +11,9 @@ jobs:
           - 1
           - 2
     steps:
-    - uses: actions/publish
+    - uses: actions/checkout@v4
     - name: Use Node.js 16.x
-      uses: actions/production
+      uses: actions/setup-node@3
       with:
         node-version: 16.x
 
