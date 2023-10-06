@@ -36,20 +36,28 @@
  */
 // const subscriptionNameOrId = 'YOUR_SUBSCRIPTION_NAME_OR_ID';
 // const timeout = 60;
+
 const photoModel = require('./photo_model');
+require('dotenv').config()
+var moment = require('moment');
 
 const ZipStream = require('zip-stream');
 const request = require('request');
 // Imports the Google Cloud client library
 const {PubSub} = require('@google-cloud/pubsub');
 const { Storage } = require('@google-cloud/storage');
+const { initializeApp, applicationDefault } = require('firebase-admin/app');
+const admin = require('firebase-admin');
+const { getAuth } = require('firebase-admin/auth');
+const { getDatabase } = require('firebase-admin/database');
+const { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } = require("firebase/auth");
 
-
-async function test () {
+// const provider = new GoogleAuthProvider();
+async function test (tags) {
     let storage = new Storage();
     const file = await storage
                     .bucket("dmii2023bucket")
-                    .file('public/users/' + "test");
+                    .file('public/users/' + tags);
     const stream = file.createWriteStream({
         metadata: {
         contentType: 'application/zip',
@@ -65,6 +73,55 @@ const pubSubClient = new PubSub({projectId: 'temporaryprojectdmii', // Your Goog
 topicNameOrId: 'dmii2-3', // Name for the new topic to create
 subscriptionName: 'dmii2-3', // Name for the new subscription to create});
 })
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA7bgu7if0_0IzIWkbBr0lKFiClyu09mfA",
+    authDomain: "temporaryprojectdmii.firebaseapp.com",
+    projectId: "temporaryprojectdmii",
+    storageBucket: "temporaryprojectdmii.appspot.com",
+    messagingSenderId: "414973090394",
+    appId: "1:414973090394:web:288cbd655aa9521e291663",
+    databaseURL: 'https://temporaryprojectdmii-default-rtdb.firebaseio.com/',
+    credential: applicationDefault(),
+    };
+
+const app = initializeApp(
+    firebaseConfig
+)
+const auth = getAuth(app);
+
+
+const db = getDatabase();
+const ref = db.ref("Jonathan/saving-data/poulet");
+
+// var result = await createUserWithEmailAndPassword(auth, 'test@abc.com', 'password').then(async function(userCredential) {
+
+//   var customToken = await adminAuth.createCustomToken(userCredential.user.uid);
+//   return customToken;
+
+// });
+// signInWithPopup(auth, provider)
+// .then((result) => {
+//   // This gives you a Google Access Token. You can use it to access the Google API.
+//   const credential = GoogleAuthProvider.credentialFromResult(result);
+//   const token = credential.accessToken;
+//   // The signed-in user info.
+//   const user = result.user;
+//   // IdP data available using getAdditionalUserInfo(result)
+//   // ...
+//   console.log("user", user)
+
+// }).catch((error) => {
+//   // Handle Errors here.
+//   console.log(error)
+//   const errorCode = error.code;
+//   const errorMessage = error.message;
+//   // The email of the user's account used.
+//   const email = error.customData.email;
+//   // The AuthCredential type that was used.
+//   const credential = GoogleAuthProvider.credentialFromError(error);
+//   // ...
+// }); 
 
 function listenForMessages(subscriptionNameOrId, timeout) {
   // References an existing subscription
@@ -93,7 +150,7 @@ function listenForMessages(subscriptionNameOrId, timeout) {
         ejsLocalVariables.searchResults = true;
 
         var queue = []
-        const stream = await test()
+        const stream = await test(message.data)
 
         // loop through photos first 10
         for (var i = 0; i < 10; i++) {
@@ -120,7 +177,22 @@ function listenForMessages(subscriptionNameOrId, timeout) {
           stream.on('error', (err) => {
             return res.status(500).send({ error });
           });
-          stream.on('finish', () => {
+          stream.on('finish', async () => {
+            const options = {
+                action: 'read',
+                expires: moment().add(2, 'days').unix() * 1000
+                };
+            let storage = new Storage();
+            const signedUrls = await storage
+                .bucket(process.env.STORAGE_BUCKET)
+                .file("public/users/" + message.data)
+                .getSignedUrl(options);
+            const zipRef = ref.child('zip');
+            zipRef.set({
+              tags: message.data,
+              path: 'public/users/' + message.data,
+              file: signedUrls
+            });
               // "Ack" (acknowledge receipt of) the message
              message.ack();
             console.log("finish")

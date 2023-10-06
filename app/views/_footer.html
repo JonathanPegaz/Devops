@@ -12,4 +12,72 @@
       </div>
     </footer>
   </body>
+  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
+    import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js'
+   
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7bgu7if0_0IzIWkbBr0lKFiClyu09mfA",
+      authDomain: "temporaryprojectdmii.firebaseapp.com",
+      projectId: "temporaryprojectdmii",
+      storageBucket: "temporaryprojectdmii.appspot.com",
+      messagingSenderId: "414973090394",
+      appId: "1:414973090394:web:288cbd655aa9521e291663",
+    };
+  
+    const app = initializeApp(
+        firebaseConfig
+    )
+    const auth = getAuth(app);
+
+    const provider = new GoogleAuthProvider();
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+  
+    signInWithEmailAndPassword(auth,  "poulet@gmail.com", "poulet123")
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        createUserWithEmailAndPassword(auth, "poulet@gmail.com", "poulet123")
+          .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            console.log(user)
+            // ...
+          })
+          .catch((error) => {
+            console.log(error)
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+
+    
+  </script>
 </html>
