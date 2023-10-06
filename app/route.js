@@ -23,7 +23,7 @@ const quickstart = async (
   const subscription = await topic.subscription(subscriptionName);
 
   // Send a message to the topic
-  await topic.publishMessage({ data: Buffer.from('Test message!') });
+  //await topic.publishMessage({ data: Buffer.from('Test message!') });
   return topic
 }
 
@@ -42,7 +42,7 @@ function route(app) {
   };
 
     const topic = await quickstart()
-    await topic.publishMessage({data: Buffer.from(req.body.tags)})
+    await topic.publishMessage({data: Buffer.from(JSON.stringify(req.body.tags))})
 
     return photoModel
     .getFlickrPhotos(tags, tagmode)

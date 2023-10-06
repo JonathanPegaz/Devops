@@ -16,7 +16,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
-    import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js'
+    import { getDatabase, ref, child, get } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js'
    
     const firebaseConfig = {
       apiKey: "AIzaSyA7bgu7if0_0IzIWkbBr0lKFiClyu09mfA",
@@ -78,6 +78,16 @@
         const errorMessage = error.message;
       });
 
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `Jonathan/saving-data/poulet/zip`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+        } else {
+          console.log("No data available");
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
     
   </script>
 </html>

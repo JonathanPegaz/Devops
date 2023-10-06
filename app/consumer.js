@@ -85,43 +85,12 @@ const firebaseConfig = {
     credential: applicationDefault(),
     };
 
-const app = initializeApp(
+  initializeApp(
     firebaseConfig
 )
-const auth = getAuth(app);
-
 
 const db = getDatabase();
 const ref = db.ref("Jonathan/saving-data/poulet");
-
-// var result = await createUserWithEmailAndPassword(auth, 'test@abc.com', 'password').then(async function(userCredential) {
-
-//   var customToken = await adminAuth.createCustomToken(userCredential.user.uid);
-//   return customToken;
-
-// });
-// signInWithPopup(auth, provider)
-// .then((result) => {
-//   // This gives you a Google Access Token. You can use it to access the Google API.
-//   const credential = GoogleAuthProvider.credentialFromResult(result);
-//   const token = credential.accessToken;
-//   // The signed-in user info.
-//   const user = result.user;
-//   // IdP data available using getAdditionalUserInfo(result)
-//   // ...
-//   console.log("user", user)
-
-// }).catch((error) => {
-//   // Handle Errors here.
-//   console.log(error)
-//   const errorCode = error.code;
-//   const errorMessage = error.message;
-//   // The email of the user's account used.
-//   const email = error.customData.email;
-//   // The AuthCredential type that was used.
-//   const credential = GoogleAuthProvider.credentialFromError(error);
-//   // ...
-// }); 
 
 function listenForMessages(subscriptionNameOrId, timeout) {
   // References an existing subscription
@@ -130,13 +99,11 @@ function listenForMessages(subscriptionNameOrId, timeout) {
   // Create an event handler to handle messages
   let messageCount = 0;
   const messageHandler = message => {
-    console.log(`Received message ${message.id}:`);
-    console.log(`\tData: ${message.data}`);
-    console.log(`\tAttributes: ${message.attributes}`);
     messageCount += 1;
 
+    const data = JSON.parse(message.data)
     const ejsLocalVariables = {
-        tagsParameter: message.data || '',
+        tagsParameter: data || '',
         tagmodeParameter: '' || '',
         photos: [],
         searchResults: false,
@@ -144,13 +111,13 @@ function listenForMessages(subscriptionNameOrId, timeout) {
     };
 
     photoModel
-      .getFlickrPhotos(message.data, 'ANY')
+      .getFlickrPhotos(data, 'ALL')
       .then(async photos => {
         ejsLocalVariables.photos = photos;
         ejsLocalVariables.searchResults = true;
 
         var queue = []
-        const stream = await test(message.data)
+        const stream = await test(data)
 
         // loop through photos first 10
         for (var i = 0; i < 10; i++) {
@@ -185,12 +152,13 @@ function listenForMessages(subscriptionNameOrId, timeout) {
             let storage = new Storage();
             const signedUrls = await storage
                 .bucket(process.env.STORAGE_BUCKET)
-                .file("public/users/" + message.data)
+                .file("public/users/" + data)
                 .getSignedUrl(options);
             const zipRef = ref.child('zip');
+            console.log(data)
             zipRef.set({
-              tags: message.data,
-              path: 'public/users/' + message.data,
+              tags: data,
+              path: 'public/users/' + data,
               file: signedUrls
             });
               // "Ack" (acknowledge receipt of) the message
