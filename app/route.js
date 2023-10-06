@@ -22,18 +22,6 @@ const quickstart = async (
   // Creates a subscription on that new topic
   const subscription = await topic.subscription(subscriptionName);
 
-  // Receive callbacks for new messages on the subscription
-  // subscription.on('message', message => {
-  //   console.log('Received message:', message.data.toString());
-  //   process.exit(0);
-  // });
-
-  // // Receive callbacks for errors on the subscription
-  // subscription.on('error', error => {
-  //   console.error('Received error:', error);
-  //   process.exit(1);
-  // });
-
   // Send a message to the topic
   await topic.publishMessage({ data: Buffer.from('Test message!') });
   return topic
@@ -110,15 +98,6 @@ function route(app) {
       .then(async photos => {
         ejsLocalVariables.photos = photos;
         ejsLocalVariables.searchResults = true;
-        // const options = {
-        //   action: 'read',
-        //   expires: moment().add(2, 'days').unix() * 1000
-        //   };
-        // const signedUrls = await storage
-        //   .bucket(process.env.STORAGE_BUCKET)
-        //   .file("test")
-        //   .getSignedUrl(options);
-        // ejsLocalVariables.signedUrls = signedUrls
         return res.render('index', ejsLocalVariables);
       })
       .catch(error => {
