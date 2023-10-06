@@ -12,4 +12,96 @@
       </div>
     </footer>
   </body>
+  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
+    import { getDatabase, ref, child, get } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js'
+
+    var button = document.getElementById('zip');
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7bgu7if0_0IzIWkbBr0lKFiClyu09mfA",
+      authDomain: "temporaryprojectdmii.firebaseapp.com",
+      projectId: "temporaryprojectdmii",
+      storageBucket: "temporaryprojectdmii.appspot.com",
+      messagingSenderId: "414973090394",
+      appId: "1:414973090394:web:288cbd655aa9521e291663",
+    };
+  
+    const app = initializeApp(
+        firebaseConfig
+    )
+    const auth = getAuth(app);
+
+    const provider = new GoogleAuthProvider();
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+  
+    signInWithEmailAndPassword(auth,  "poulet@gmail.com", "poulet123")
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        createUserWithEmailAndPassword(auth, "poulet@gmail.com", "poulet123")
+          .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            console.log(user)
+            // ...
+          })
+          .catch((error) => {
+            console.log(error)
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+
+      const dbRef = ref(getDatabase());
+
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // don't submit
+        get(child(dbRef, `Jonathan/saving-data/poulet/zip`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            console.log(snapshot.val());
+            var link = document.createElement("a");
+            link.download = snapshot.val().tags;
+            link.href = snapshot.val().file[0];
+            console.log(link)
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            //delete link;
+            link.click();
+          } else {
+            console.log("No data available");
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+    })
+  </script>
 </html>
