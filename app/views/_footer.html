@@ -17,7 +17,9 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
     import { getDatabase, ref, child, get } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js'
-   
+
+    var button = document.getElementById('zip');
+    
     const firebaseConfig = {
       apiKey: "AIzaSyA7bgu7if0_0IzIWkbBr0lKFiClyu09mfA",
       authDomain: "temporaryprojectdmii.firebaseapp.com",
@@ -79,15 +81,27 @@
       });
 
       const dbRef = ref(getDatabase());
-      get(child(dbRef, `Jonathan/saving-data/poulet/zip`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          console.log(snapshot.val());
-        } else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    
+
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // don't submit
+        get(child(dbRef, `Jonathan/saving-data/poulet/zip`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            console.log(snapshot.val());
+            var link = document.createElement("a");
+            link.download = snapshot.val().tags;
+            link.href = snapshot.val().file[0];
+            console.log(link)
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            //delete link;
+            link.click();
+          } else {
+            console.log("No data available");
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+    })
   </script>
 </html>
